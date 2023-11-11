@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digit Prediction</title>
+    <script>
+        function updateRequiredAttribute() {
+            // Get the elements
+            var userPredictedDigitInput = document.getElementById('user_predicted_digit');
+            var incorrectButton = document.getElementById('incorrect_button');
+
+            // Check if the prediction is incorrect
+            var isIncorrect = document.querySelector('input[name="feedback"]:checked').value === 'incorrect';
+
+            // Set the "required" attribute based on correctness
+            userPredictedDigitInput.required = isIncorrect;
+            incorrectButton.required = isIncorrect;
+        }
+    </script>
+</head>
+<body>
+    <h1>Predicted Digit: {{ predicted_digit }}</h1>
+
+    <form method="post" action="{% url 'draw:update' %}" onsubmit="updateRequiredAttribute()">
+        {% csrf_token %} 
+        <label for="user_predicted_digit">Enter Predicted Digit:</label>
+        <input type="text" id="user_predicted_digit" name="predicted_digit">
+        <button type="submit" name="feedback" value="correct">Correct</button>
+        <button type="submit" name="feedback" id="incorrect_button" value="incorrect">Incorrect</button>
+    </form>
+</body>
+</html>
+
