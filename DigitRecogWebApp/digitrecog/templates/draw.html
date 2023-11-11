@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digit Drawing Form</title>
+    <style>
+        #digitCanvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <form id="digitForm" method="post" action="{% url 'draw:predict' %}">
+        {% csrf_token %}
+        <canvas id="digitCanvas" width="200" height="200"></canvas>
+        <input type="hidden" name="digit_image" id="digitImage">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var canvas = document.getElementById('digitCanvas');
+            var context = canvas.getContext('2d');
+            var isDrawing = false;
+
+            canvas.addEventListener('mousedown', function(e) {
+                isDrawing = true;
+                draw(e);
+            });
+
+            canvas.addEventListener('mousemove', function(e) {
+                if (isDrawing) {
+                    draw(e);
+                }
+            });
+
+            canvas.addEventListener('mouseup', function() {
+                isDrawing = false;
+            });
+
+            function draw(e) {
+                context.beginPath();
+                context.lineWidth = 10;
+                context.lineCap = 'round';
+                context.strokeStyle = '#000';
+                context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+                context.stroke();
+                context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+                updateHiddenInput();
+            }
+
+            function updateHiddenInput() {
+                var tempCanvas = document.createElement('canvas');
+                var tempContext = tempCanvas.getContext('2d');
+
+                // Resize the canvas to 28x28
+                tempCanvas.width = 28;
+                tempCanvas.height = 28;
+
+                // Draw the current canvas content onto the resized canvas
+                tempContext.drawImage(canvas, 0, 0, 28, 28);
+
+                // Convert the resized canvas to a data URL
+                var imageData = tempCanvas.toDataURL();
+                document.getElementById('digitImage').value = imageData;
+            }
+        });
+    </script>
+</body>
+</html>
